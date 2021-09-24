@@ -49,6 +49,10 @@ class CMakeBuild(build_ext):
                       # TODO: Still need this?
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
+        gtest_root = os.environ.get('GTEST_ROOT')
+        if gtest_root:
+            cmake_args += ["-DGTEST_ROOT=" + os.path.abspath(gtest_root)]
+
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
@@ -62,11 +66,18 @@ class CMakeBuild(build_ext):
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             build_args += ['--', '-j2']
-        
+
+        cxx_flags = [
+            os.environ.get('CXXFLAGS', ''),
+            '-DVERSION_INFO=\\"{}\\"'.format(self.distribution.get_version())
+        ]
+        if gtest_root:
+            g_inc = os.path.abspath(os.path.join(gtest_root, "googletest", "include"))
+            cxx_flags += ['-I' + g_inc]
+
         env = os.environ.copy()
-        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(
-            env.get('CXXFLAGS', ''),
-            self.distribution.get_version())
+        env['CXXFLAGS'] = ' '.join(cxx_flags)
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
