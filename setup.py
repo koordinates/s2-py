@@ -41,7 +41,8 @@ class CMakeBuild(build_ext):
                 ext.name
         ))
         
-        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
+        cmake_args = ['-Wno-dev',
+                      '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DCMAKE_SWIG_OUTDIR=' + extdir,
                       '-DWITH_PYTHON=ON',
                       '-DPython3_EXECUTABLE:FILEPATH=' + sys.executable,
