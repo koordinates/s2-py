@@ -9,3 +9,15 @@ Note that currently it seems that the Google test framework is [mistakenly not o
 
 ### Notes
 All credit goes to Google; this is just a wrapper around their lib.
+
+
+### Building a Linux wheel
+
+In ubuntu focal:
+
+```bash
+apt update
+apt install cmake libssl-dev swig4.0 libgtest-dev
+
+python3 setup.py bdist_wheel
+```
