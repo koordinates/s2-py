@@ -17,7 +17,10 @@ RUN apt install -y cmake libssl-dev swig4.0 libgtest-dev git build-essential
 
 # https://github.com/abseil/abseil-cpp/blob/master/CMake/README.md#traditional-cmake-set-up
 RUN mkdir -p /source /build
-RUN git clone https://github.com/abseil/abseil-cpp.git /source/abseil-cpp
+# this commit hash is the commit it definitely worked at. Feel free to update it
+RUN git clone https://github.com/abseil/abseil-cpp.git /source/abseil-cpp \
+    && cd /source/abseil-cpp \
+    && git checkout 9e408e050ff3c1db12f9a58081b6af10e05561c4
 
 # If you don't be damned sure these are set to the same value for both abseil and the following wheel build,
 # you get weird runtime errors because some garbley symbol isn't defined.
