@@ -2,8 +2,11 @@
 # Build an s2-py wheel for a particular version of python.
 # Usage:
 #    for PYTHON_VERSION in 3.7 3.8 ; do
-#      docker build --build-arg "PYTHON_VERSION=$PYTHON_VERSION" -t s2geometry-builder . \
-#      && docker run --rm -v $(pwd)/dist:/dist s2geometry-builder
+#        for ARCH in amd64 arm64/v8 ; do 
+#            TAG="s2geometry-builder-$ARCH"
+#            docker buildx build --load --platform="linux/$ARCH" --build-arg "PYTHON_VERSION=$PYTHON_VERSION" -t "$TAG" . \
+#            && docker run --rm -v $(pwd)/dist:/dist "$TAG"
+#        done
 #    done
 #
 # Output goes to dist/*.whl
@@ -11,6 +14,11 @@
 
 ARG PYTHON_VERSION
 FROM python:${PYTHON_VERSION}
+
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
+RUN echo " build: ${BUILDPLATFORM} target: ${TARGETPLATFORM}"
+
 
 RUN apt update -q
 RUN apt install -y cmake libssl-dev swig4.0 libgtest-dev git build-essential
