@@ -1,19 +1,16 @@
 #
-# Build an s2-py wheel for a particular version of python.
+# Build an s2-py wheel for Ubuntu jammy and python 3.10
 # Usage:
-#    for PYTHON_VERSION in 3.7 3.8 3.10 ; do
-#        for ARCH in amd64 arm64/v8 ; do 
-#            TAG="s2geometry-builder-$ARCH"
-#            docker buildx build --load --platform="linux/$ARCH" --build-arg "PYTHON_VERSION=$PYTHON_VERSION" -t "$TAG" . \
-#            && docker run --rm -v $(pwd)/dist:/dist "$TAG"
-#        done
+#    for ARCH in amd64 arm64/v8 ; do 
+#        TAG="s2geometry-builder-$ARCH"
+#        docker buildx build --load --platform="linux/$ARCH" -t "$TAG" . \
+#        && docker run --rm -v $(pwd)/dist:/dist "$TAG"
 #    done
 #
 # Output goes to dist/*.whl
 #
 
-ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}
+FROM ubuntu:jammy
 
 ARG BUILDPLATFORM
 ARG TARGETPLATFORM
@@ -21,7 +18,7 @@ RUN echo " build: ${BUILDPLATFORM} target: ${TARGETPLATFORM}"
 
 
 RUN apt update -q
-RUN apt install -y cmake libssl-dev swig4.0 libgtest-dev git build-essential
+RUN apt install -y cmake libssl-dev swig4.0 libgtest-dev git build-essential python3 python3-setuptools python3-wheel python3-dev
 
 # https://github.com/abseil/abseil-cpp/blob/master/CMake/README.md#traditional-cmake-set-up
 RUN mkdir -p /source /build
@@ -46,4 +43,4 @@ WORKDIR /s2py-src
 VOLUME /dist
 
 ENV CMAKE_PREFIX_PATH=/installation/dir
-CMD ["python3", "setup.py", "bdist_wheel", "--dist-dir", "/dist"]
+CMD ["python3.10", "setup.py", "bdist_wheel", "--dist-dir", "/dist"]
