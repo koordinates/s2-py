@@ -36,21 +36,20 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         extdir = os.path.abspath(
-            os.path.join(
-                os.path.dirname(self.get_ext_fullpath(ext.name)),
-                ext.name
-        ))
-        
-        cmake_args = ['-Wno-dev',
-                      '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DCMAKE_SWIG_OUTDIR=' + extdir,
-                      '-DWITH_PYTHON=ON',
-                      '-DPython3_EXECUTABLE:FILEPATH=' + sys.executable,
+            os.path.join(os.path.dirname(self.get_ext_fullpath(ext.name)), ext.name)
+        )
 
-                      # TODO: Still need this?
-                      '-DPYTHON_EXECUTABLE=' + sys.executable]
+        cmake_args = [
+            "-Wno-dev",
+            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + extdir,
+            "-DCMAKE_SWIG_OUTDIR=" + extdir,
+            "-DWITH_PYTHON=ON",
+            "-DPython3_EXECUTABLE:FILEPATH=" + sys.executable,
+            # Kx: force build with same C++ standard as Abseil (see Dockerfile)
+            "-DCMAKE_CXX_STANDARD={}".format(os.environ["CMAKE_CXX_STANDARD"]),
+        ]
 
-        gtest_root = os.environ.get('GTEST_ROOT')
+        gtest_root = os.environ.get("GTEST_ROOT")
         if gtest_root:
             cmake_args += ["-DGTEST_ROOT=" + os.path.abspath(gtest_root)]
 
