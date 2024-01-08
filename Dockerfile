@@ -10,7 +10,8 @@
 # Output goes to dist/*.whl
 #
 
-FROM ubuntu:jammy
+
+FROM debian:bookworm-slim
 
 ARG BUILDPLATFORM
 ARG TARGETPLATFORM
