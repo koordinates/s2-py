@@ -1,5 +1,5 @@
 #
-# Build an s2-py wheel for Ubuntu jammy and python 3.10
+# Build an s2-py wheel
 # Usage:
 #    for ARCH in amd64 arm64/v8 ; do 
 #        TAG="s2geometry-builder-$ARCH"
@@ -10,8 +10,8 @@
 # Output goes to dist/*.whl
 #
 
-
-FROM debian:bookworm-slim
+ARG PYTHON_VERSION=3.12
+FROM python:${PYTHON_VERSION}-slim
 
 ARG BUILDPLATFORM
 ARG TARGETPLATFORM
@@ -19,7 +19,7 @@ RUN echo " build: ${BUILDPLATFORM} target: ${TARGETPLATFORM}"
 
 
 RUN apt update -q
-RUN apt install -y cmake libssl-dev swig4.0 libgtest-dev git build-essential python3 python3-setuptools python3-wheel python3-dev
+RUN apt install -y cmake libssl-dev swig4.0 libgtest-dev git build-essential
 
 # https://github.com/abseil/abseil-cpp/blob/master/CMake/README.md#traditional-cmake-set-up
 RUN mkdir -p /source /build
@@ -50,6 +50,7 @@ RUN cmake -S /source/abseil-cpp -B /build/abseil-cpp \
     -DABSL_FIND_GOOGLETEST=ON \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
 RUN cmake --build /build/abseil-cpp --target install
+RUN python3 -m pip install build
 
 COPY . /s2py-src
 RUN mkdir /dist
@@ -58,4 +59,4 @@ WORKDIR /s2py-src
 VOLUME /dist
 
 ENV CMAKE_PREFIX_PATH=/installation/dir
-CMD ["python3", "setup.py", "bdist_wheel", "--dist-dir", "/dist"]
+CMD ["python3", "-m", "build", "--wheel", "--outdir=/dist/", "."]
