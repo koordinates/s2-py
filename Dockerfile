@@ -19,14 +19,15 @@ RUN echo " build: ${BUILDPLATFORM} target: ${TARGETPLATFORM}"
 
 
 RUN apt update -q
-RUN apt install -y cmake libssl-dev swig4.0 libgtest-dev git build-essential
+RUN apt install -y cmake libssl-dev swig libgtest-dev git build-essential
 
 # https://github.com/abseil/abseil-cpp/blob/master/CMake/README.md#traditional-cmake-set-up
 RUN mkdir -p /source /build
-# this commit hash is the commit it definitely worked at. Feel free to update it
+# Abseil LTS. Older commits fail to compile on trixie's GCC 14 (missing <cstdint>
+# includes). Bump this if needed; keep it compatible with the s2geometry fork.
 RUN git clone https://github.com/abseil/abseil-cpp.git /source/abseil-cpp \
     && cd /source/abseil-cpp \
-    && git checkout 9e408e050ff3c1db12f9a58081b6af10e05561c4
+    && git checkout 20240722.1
 
 # This patch is needed to force Abseil to define `absl::string_view`, which s2-py uses.
 # Without the patch, it may or may not be available depending on C++ standard being used.
